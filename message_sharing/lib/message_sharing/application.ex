@@ -3,7 +3,7 @@ defmodule MessageSharing.Application do
 
   def start(_type, _args) do
     children = [
-      {MessageSharing.QueueReader, []}
+      {MessageSharing.MessageProcessor}
     ]
 
     ops = [strategy: :one_for_one, name: MessageSharing.Supervisor]

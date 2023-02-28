@@ -1,14 +1,27 @@
 defmodule MessageSharing.MessageQueue do
-  @queue []
+  use GenServer
+
+  def start_link(_) do
+    GenServer.start_link(__MODULE__, [], name: __MODULE__)
+  end
 
   def add(message) do
-    {:ok, [@queue ++ [message]]}
+    GenServer.cast(__MODULE__, {:add, message})
   end
 
   def pop() do
-    case @queue do
-      [] -> {:error, "Empty"}
-      [h | t] -> {:ok, h, t}
-    end
+    GenServer.call(__MODULE__, :pop)
+  end
+
+  def handle_cast({:add, message}, state) do
+    {:noreply, [state | message]}
+  end
+
+  def handle_call(:pop, _from, [h | t]) do
+    {:reply, {:ok, h}, t}
+  end
+
+  def handle_call(:pop, _from, []) do
+    {:reply, {:error, "Empty"}, []}
   end
 end
