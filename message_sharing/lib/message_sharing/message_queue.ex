@@ -24,4 +24,9 @@ defmodule MessageSharing.MessageQueue do
   def handle_call(:pop, _from, []) do
     {:noreply, nil}
   end
+
+  def stop do
+    GenServer.cast(__MODULE__, :stop)
+  end
+
 end
