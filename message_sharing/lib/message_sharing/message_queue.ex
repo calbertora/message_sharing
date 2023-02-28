@@ -22,6 +22,6 @@ defmodule MessageSharing.MessageQueue do
   end
 
   def handle_call(:pop, _from, []) do
-    {:reply, {:error, "Empty"}, []}
+    {:noreply, nil}
   end
 end

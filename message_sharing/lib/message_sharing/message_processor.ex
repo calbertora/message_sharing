@@ -9,15 +9,24 @@ defmodule MessageSharing.MessageProcessor do
     {:ok, nil}
   end
 
-  def handle_info(:process, state) do
-    case MessageQueue.pop() do
-      {:ok, message, _} ->
-        IO.puts "Processing message #{inspect message}"
-        {:noreply, nil}
+  def process(message) do
+    GenServer.call(__MODULE__, {:process, message})
+  end
 
-      {:error, _} ->
-        IO.puts "Empty Queue"
-        {:noreply, nil}
+  def handle_call({:process, message}, _from, state) do
+    case MessageQueue.pop() do
+      nil ->
+        {:reply, "No message to process", state}
+
+      {:ok, _pid, msg} when msg == message ->
+        {:reply, "Message processed successfully", state}
+
+      {:ok, _pid, msg} ->
+        MessageQueue.add(msg)
+        {:reply, "Message not available to process, added to queue", state}
+
+      {:error, _reason} ->
+        {:reply, "Error processing message", state}
     end
   end
 end
